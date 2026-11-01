@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#e6ecf2">
+<title>Moma — Money Management Made Simple</title>
+<style>
+:root{
+  --mint:#a8e6cf;--sky:#dceff9;--turq:#56cfe1;--frost:#e6ecf2;
+  --ink:#2b3e50;--muted:#718096;--rose:#ffb5a7;--white:#f8fbfd;
+  --shadow:8px 8px 18px #cbd3dc,-8px -8px 18px #fff;
+  --inset:inset 4px 4px 9px #cbd3dc,inset -4px -4px 9px #fff;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--frost);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+.app{max-width:980px;margin:auto;padding:22px 16px 44px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:22px}
+.brand{font-size:27px;font-weight:800;letter-spacing:-1px}
+.brand span{color:#36a9b9}
+.tagline{font-size:12px;color:var(--muted)}
+.pill{background:var(--sky);padding:9px 13px;border-radius:20px;font-size:12px;font-weight:700}
+h1{font-size:23px;margin:8px 0 5px}
+.subtitle{color:var(--muted);font-size:13px;margin:0 0 18px}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:5px 3px 13px}
+.tab{border:0;background:var(--frost);color:var(--muted);padding:11px 16px;border-radius:14px;box-shadow:var(--shadow);font-weight:700;white-space:nowrap;cursor:pointer}
+.tab.active{background:var(--mint);color:var(--ink);box-shadow:var(--inset)}
+.panel{display:none}.panel.active{display:block}
+.card{background:var(--frost);border-radius:20px;padding:18px;margin:10px 0;box-shadow:var(--shadow)}
+.card h2{font-size:16px;margin:0 0 14px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.stat{padding:14px;border-radius:16px;background:var(--frost);box-shadow:var(--inset);min-width:0}
+.stat small{display:block;color:var(--muted);font-size:11px;margin-bottom:7px}
+.stat strong{font-size:19px;overflow-wrap:anywhere}
+.stat em{display:block;font-size:11px;color:var(--muted);font-style:normal;margin-top:5px}
+label{display:block;font-size:12px;font-weight:700;margin:0 0 6px}
+input{width:100%;border:0;border-radius:12px;padding:13px;background:var(--frost);box-shadow:var(--inset);color:var(--ink);font:inherit;outline:none}
+.field{margin-bottom:12px}
+button.primary,button.secondary,button.danger{border:0;border-radius:13px;padding:12px 16px;font-weight:800;cursor:pointer}
+.primary{background:var(--turq);color:#173d49}
+.secondary{background:var(--sky);color:var(--ink)}
+.danger{background:#ffe1dc;color:#87483e}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.note{font-size:12px;color:var(--muted);line-height:1.55}
+.progress{height:12px;border-radius:20px;background:#d1d9e1;overflow:hidden;box-shadow:var(--inset);margin:12px 0 7px}
+.progress>div{height:100%;width:0;background:var(--turq);border-radius:20px;transition:width .2s}
+.rowline{display:flex;justify-content:space-between;gap:10px;font-size:13px;margin:8px 0}
+.record{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #d5dde5;font-size:13px}
+.record:last-child{border:0}
+.record strong{display:block}
+.record small{color:var(--muted)}
+.record button{border:0;background:transparent;color:#a45c52;font-weight:700;cursor:pointer}
+.badge{font-size:11px;background:var(--mint);padding:5px 9px;border-radius:12px;font-weight:800}
+.empty{color:var(--muted);font-size:13px;text-align:center;padding:18px}
+footer{text-align:center;color:var(--muted);font-size:11px;margin-top:24px}
+@media(max-width:620px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.grid{grid-template-columns:1fr}.brand{font-size:24px}.card{padding:15px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div><div class="brand">m<span>o</span>ma.</div><div class="tagline">a simple way to manage your money</div></div>
+  <div class="pill">Money Management Made Simple</div>
+</header>
+
+<h1>Ringkasan keuangan & penjualan</h1>
+<p class="subtitle">Catat penjualan, pantau target BEP, dan lihat pembagian gaji harianmu.</p>
+
+<nav class="tabs" aria-label="Navigasi">
+  <button class="tab active" data-tab="harian">Harian</button>
+  <button class="tab" data-tab="mingguan">Mingguan</button>
+  <button class="tab" data-tab="bulanan">Bulanan</button>
+  <button class="tab" data-tab="keuangan">Keuangan</button>
+</nav>
+
+<section id="harian" class="panel active">
+  <div class="card">
+    <h2>Catat penjualan harian</h2>
+    <div class="grid">
+      <div class="field"><label for="saleDate">Tanggal</label><input id="saleDate" type="date"></div>
+      <div class="field"><label for="cups">Jumlah cup terjual</label><input id="cups" type="number" min="0" step="1" placeholder="Contoh: 32"></div>
+      <div class="field"><label for="revenue">Omzet hari itu (Rp)</label><input id="revenue" type="number" min="0" step="1000" placeholder="Contoh: 320000"></div>
+    </div>
+    <div class="actions"><button class="primary" id="saveSale">Simpan catatan</button><button class="secondary" id="clearSale">Kosongkan</button></div>
+    <p class="note">Satu catatan per tanggal. Jika tanggal yang sama disimpan lagi, catatan sebelumnya akan diperbarui.</p>
+  </div>
+  <div class="card">
+    <h2>Pencapaian BEP hari ini</h2>
+    <div class="stats">
+      <div class="stat"><small>Cup terjual</small><strong id="todayCups">0</strong><em>dari target 30 cup</em></div>
+      <div class="stat"><small>Omzet</small><strong id="todayRevenue">Rp0</strong><em>total penjualan hari ini</em></div>
+      <div class="stat"><small>Selisih target</small><strong id="todayGap">30</strong><em id="todayStatus">cup menuju BEP</em></div>
+    </div>
+    <div class="progress"><div id="todayBar"></div></div>
+    <div class="rowline"><span>Progress target</span><strong id="todayPercent">0%</strong></div>
+  </div>
+  <div class="card">
+    <h2>Riwayat catatan</h2>
+    <div id="salesHistory"></div>
+  </div>
+</section>
+
+<section id="mingguan" class="panel">
+  <div class="card">
+    <h2>Ringkasan mingguan</h2>
+    <div class="field"><label for="weekDate">Pilih salah satu tanggal dalam minggu</label><input id="weekDate" type="date"></div>
+    <p class="note" id="weekRange"></p>
+    <div class="stats">
+      <div class="stat"><small>Total cup</small><strong id="weekCups">0</strong><em>target 210 cup / 7 hari</em></div>
+      <div class="stat"><small>Total omzet</small><strong id="weekRevenue">Rp0</strong><em>akumulasi 7 hari</em></div>
+      <div class="stat"><small>Rata-rata per hari</small><strong id="weekAverage">0</strong><em>cup per hari kalender</em></div>
+    </div>
+    <div class="progress"><div id="weekBar"></div></div>
+    <div class="rowline"><span>Progress target mingguan</span><strong id="weekPercent">0%</strong></div>
+  </div>
+</section>
+
+<section id="bulanan" class="panel">
+  <div class="card">
+    <h2>Ringkasan bulanan</h2>
+    <div class="field"><label for="monthDate">Pilih bulan</label><input id="monthDate" type="month"></div>
+    <p class="note">Perhitungan target memakai asumsi 30 hari: 30 cup × 30 hari = 900 cup.</p>
+    <div class="stats">
+      <div class="stat"><small>Total cup</small><strong id="monthCups">0</strong><em>target 900 cup</em></div>
+      <div class="stat"><small>Total omzet</small><strong id="monthRevenue">Rp0</strong><em>akumulasi bulan</em></div>
+      <div class="stat"><small>Rata-rata</small><strong id="monthAverage">0</strong><em>cup per hari dari 30 hari</em></div>
+      <div class="stat"><small>Hari mencapai BEP</small><strong id="daysAtBep">0</strong><em>dari 30 hari</em></div>
+      <div class="stat"><small>Hari tercatat</small><strong id="daysRecorded">0</strong><em>tanggal dengan catatan</em></div>
+      <div class="stat"><small>Progress target</small><strong id="monthPercent">0%</strong><em>terhadap 900 cup</em></div>
+    </div>
+    <div class="progress"><div id="monthBar"></div></div>
+  </div>
+</section>
+
+<section id="keuangan" class="panel">
+  <div class="card">
+    <h2>Simulasi pembagian gaji</h2>
+    <p class="note">Gaji harian ditetapkan Rp67.000. Angka di bawah adalah alokasi dari upah yang terkumpul di wadah, bukan uang tunai yang sudah kamu terima.</p>
+    <div class="grid">
+      <div class="field"><label for="workDays">Jumlah hari kerja</label><input id="workDays" type="number" min="0" max="30" value="30"></div>
+      <div class="field"><label for="kasbon">Kasbon yang diambil (Rp)</label><input id="kasbon" type="number" min="0" value="0"></div>
+      <div class="field"><label for="minus">Minus/potongan aktual (Rp)</label><input id="minus" type="number" min="0" value="0"></div>
+    </div>
+    <div class="stats">
+      <div class="stat"><small>Total upah terkumpul</small><strong id="earned">Rp2.010.000</strong><em>Rp67.000 × hari kerja</em></div>
+      <div class="stat"><small>Cadangan minus tersisa</small><strong id="reserveLeft">Rp600.000</strong><em>alokasi Rp20.000/hari dikurangi minus</em></div>
+      <div class="stat"><small>Uang terlindungi</small><strong id="protected">Rp900.000</strong><em>Rp30.000/hari</em></div>
+      <div class="stat"><small>Jatah kasbon tersisa</small><strong id="allowanceLeft">Rp510.000</strong><em>alokasi Rp17.000/hari dikurangi kasbon</em></div>
+      <div class="stat"><small>Perkiraan sisa wadah</small><strong id="net">Rp2.010.000</strong><em>upah − minus aktual − kasbon</em></div>
+      <div class="stat"><small>Di luar alokasi</small><strong id="overrun">Rp0</strong><em>minus/kasbon yang melewati alokasinya</em></div>
+    </div>
+    <p class="note" id="financeNote">Cadangan minus dan jatah kasbon adalah batas alokasi, bukan kewajiban untuk dihabiskan. Sisa akhir tetap mengikuti perhitungan aktual saat gajian.</p>
+  </div>
+  <div class="card">
+    <h2>Patokan alokasi harian</h2>
+    <div class="rowline"><span>Cadangan minus</span><strong>Rp20.000</strong></div>
+    <div class="rowline"><span>Uang terlindungi</span><strong>Rp30.000</strong></div>
+    <div class="rowline"><span>Jatah kasbon terencana</span><strong>Rp17.000</strong></div>
+    <div class="rowline"><strong>Total gaji harian</strong><strong>Rp67.000</strong></div>
+  </div>
+</section>
+<footer>Moma · Data tersimpan di browser/perangkat ini menggunakan penyimpanan lokal.</footer>
+</div>
+
+<script>
+const STORAGE_KEY = "moma_sales_v1";
+const $ = id => document.getElementById(id);
+const rupiah = n => new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(Number(n)||0);
+const localISO = d => { const x=new Date(d.getTime()-d.getTimezoneOffset()*60000); return x.toISOString().slice(0,10); };
+const today = localISO(new Date());
+let sales = {};
+try { sales = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}") || {}; } catch(e) { sales = {}; }
+function persist(){ localStorage.setItem(STORAGE_KEY,JSON.stringify(sales)); }
+function safeNum(v){ const n=Number(v); return Number.isFinite(n)&&n>0?n:0; }
+function dateKey(d){return localISO(d);}
+function weekStart(value){
+  const d=new Date(value+"T12:00:00"); const day=(d.getDay()+6)%7; d.setDate(d.getDate()-day); return d;
+}
+function sumRange(start,end){
+  let cups=0,revenue=0,days=0,atBep=0;
+  for(let d=new Date(start);d<=end;d.setDate(d.getDate()+1)){
+    const key=dateKey(d),r=sales[key];
+    if(r){cups+=safeNum(r.cups);revenue+=safeNum(r.revenue);days++;if(safeNum(r.cups)>=30)atBep++;}
+  }
+  return {cups,revenue,days,atBep};
+}
+function setProgress(barId,percentId,value,target){
+  const pct=target?value/target*100:0;
+  $(barId).style.width=Math.min(100,Math.max(0,pct))+"%";
+  $(percentId).textContent=Math.round(pct)+"%";
+}
+function renderToday(){
+  const key=$("saleDate").value || today, r=sales[key]||{cups:0,revenue:0};
+  const cups=safeNum(r.cups), rev=safeNum(r.revenue), gap=Math.max(0,30-cups);
+  $("todayCups").textContent=cups;
+  $("todayRevenue").textContent=rupiah(rev);
+  $("todayGap").textContent=cups>=30?"Tercapai":gap;
+  $("todayStatus").textContent=cups>=30?"target BEP tercapai":"cup menuju BEP";
+  setProgress("todayBar","todayPercent",cups,30);
+  renderHistory();
+}
+function renderHistory(){
+  const entries=Object.entries(sales).sort((a,b)=>b[0].localeCompare(a[0]));
+  $("salesHistory").innerHTML=entries.length?entries.map(([date,r])=>{
+    const reached=safeNum(r.cups)>=30;
+    return `<div class="record"><div><strong>${new Date(date+"T12:00:00").toLocaleDateString("id-ID",{day:"numeric",month:"short",year:"numeric"})}</strong><small>${safeNum(r.cups)} cup · ${rupiah(r.revenue)}</small></div><div style="display:flex;align-items:center;gap:10px"><span class="badge">${reached?"BEP tercapai":"Belum BEP"}</span><button data-delete="${date}" aria-label="Hapus catatan">Hapus</button></div></div>`;
+  }).join(""):'<div class="empty">Belum ada catatan penjualan.</div>';
+  document.querySelectorAll("[data-delete]").forEach(btn=>btn.addEventListener("click",()=>{
+    const key=btn.dataset.delete;
+    if(confirm("Hapus catatan tanggal "+key+"?")){delete sales[key];persist();renderAll();}
+  }));
+}
+function renderWeek(){
+  const selected=$("weekDate").value||today,start=weekStart(selected),end=new Date(start);end.setDate(end.getDate()+6);
+  const s=sumRange(start,end);
+  $("weekRange").textContent=start.toLocaleDateString("id-ID",{day:"numeric",month:"short"})+" – "+end.toLocaleDateString("id-ID",{day:"numeric",month:"short",year:"numeric"});
+  $("weekCups").textContent=s.cups;$("weekRevenue").textContent=rupiah(s.revenue);$("weekAverage").textContent=(s.cups/7).toFixed(1);
+  setProgress("weekBar","weekPercent",s.cups,210);
+}
+function renderMonth(){
+  const val=$("monthDate").value||today.slice(0,7),[year,month]=val.split("-").map(Number);
+  const start=new Date(year,month-1,1,12),end=new Date(year,month-1,30,12);
+  const s=sumRange(start,end);
+  $("monthCups").textContent=s.cups;$("monthRevenue").textContent=rupiah(s.revenue);
+  $("monthAverage").textContent=(s.cups/30).toFixed(1);$("daysAtBep").textContent=s.atBep;
+  $("daysRecorded").textContent=s.days;
+  setProgress("monthBar","monthPercent",s.cups,900);
+}
+function renderFinance(){
+  const days=Math.min(30,Math.floor(safeNum($("workDays").value)));
+  const kasbon=safeNum($("kasbon").value),minus=safeNum($("minus").value);
+  const earned=days*67000,reserve=days*20000,protectedMoney=days*30000,allowance=days*17000;
+  const reserveLeft=reserve-minus,allowanceLeft=allowance-kasbon;
+  $("earned").textContent=rupiah(earned);
+  $("reserveLeft").textContent=rupiah(reserveLeft);
+  $("protected").textContent=rupiah(protectedMoney);
+  $("allowanceLeft").textContent=rupiah(allowanceLeft);
+  $("net").textContent=rupiah(earned-minus-kasbon);
+  $("overrun").textContent=rupiah(Math.max(0,-reserveLeft)+Math.max(0,-allowanceLeft));
+  $("financeNote").textContent=(reserveLeft<0||allowanceLeft<0)
+    ?"Ada pengeluaran yang melewati alokasi. Angka negatif pada alokasi berarti batas tersebut terlampaui; sisa wadah tetap dihitung dari upah dikurangi minus dan kasbon aktual."
+    :"Alokasi ini hanya simulasi pembagian. Cadangan minus dikurangi potongan aktual, jatah kasbon dikurangi kasbon, dan uang terlindungi ditampilkan terpisah. Pastikan angka aktual saat gajian tetap dicocokkan.";
+}
+function renderAll(){renderToday();renderWeek();renderMonth();renderFinance();}
+document.querySelectorAll(".tab").forEach(btn=>btn.addEventListener("click",()=>{
+  document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b===btn));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active",p.id===btn.dataset.tab));
+}));
+$("saleDate").value=today;$("weekDate").value=today;$("monthDate").value=today.slice(0,7);
+$("saveSale").addEventListener("click",()=>{
+  const date=$("saleDate").value,cups=$("cups").value,revenue=$("revenue").value;
+  if(!date){alert("Pilih tanggal terlebih dahulu.");return;}
+  if(cups===""||revenue===""){alert("Isi jumlah cup dan omzet terlebih dahulu.");return;}
+  sales[date]={cups:safeNum(cups),revenue:safeNum(revenue)};
+  persist();renderAll();alert("Catatan penjualan tersimpan.");
+});
+$("clearSale").addEventListener("click",()=>{$("cups").value="";$("revenue").value="";});
+$("saleDate").addEventListener("change",()=>{
+  const r=sales[$("saleDate").value];
+  $("cups").value=r?r.cups:"";$("revenue").value=r?r.revenue:"";renderToday();
+});
+$("weekDate").addEventListener("change",renderWeek);
+$("monthDate").addEventListener("change",renderMonth);
+["workDays","kasbon","minus"].forEach(id=>$(id).addEventListener("input",renderFinance));
+const initial=sales[today];if(initial){$("cups").value=initial.cups;$("revenue").value=initial.revenue;}
+renderAll();
+</script>
+</body>
+</html>
